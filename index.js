@@ -18,6 +18,7 @@ class Task {
     taskItemDescription.textContent = `${this.description}`;
     taskItem.appendChild(taskItemDescription);
   }
+
   deleteButton(taskItem) {
     const deleteButton = document.createElement("button");
     deleteButton.className = "delete-button";
@@ -25,6 +26,7 @@ class Task {
 
     deleteButton.addEventListener("click", () => {
       taskItem.remove();
+      TaskManager.removeTaskFromLocalStorage(this.id);
     });
     taskItem.appendChild(deleteButton);
   }
@@ -62,6 +64,31 @@ class TaskManager {
     taskList.appendChild(taskItem);
   }
 
+  static LocalStorageSave(task) {
+    let tasks = [];
+    if (localStorage.getItem("tasks")) {
+      tasks = JSON.parse(localStorage.getItem("tasks"));
+    }
+    task.id = Date.now();
+    tasks.push(task);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
+
+  static removeTaskFromLocalStorage(id) {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    const updatedTasks = tasks.filter((task) => task.id !== id);
+    localStorage.setItem("tasks", JSON.stringify(updatedTasks));
+  }
+
+  static loadTasksFromLocalStorage() {
+    const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.forEach((task) => {
+      const newTask = new Task(task.title, task.description);
+      newTask.id = task.id;
+      TaskManager.addTaskDOM(newTask);
+    });
+  }
+
   static handlerAddTask() {
     const formTitleValues = TaskManager.getTaskTitle();
     const formDescriptionValues = TaskManager.getTaskDescription();
@@ -72,9 +99,14 @@ class TaskManager {
 
     if (TaskManager.isValidTask(newTask)) {
       TaskManager.addTaskDOM(newTask);
+      TaskManager.LocalStorageSave(newTask);
     }
   }
 }
+
+window.onload = function () {
+  TaskManager.loadTasksFromLocalStorage();
+};
 
 document.getElementById("addTaskBtn").addEventListener("click", () => {
   TaskManager.handlerAddTask();
