@@ -90,12 +90,12 @@ class TaskManager {
   }
 
   static handlerAddTask() {
-    const formTitleValues = TaskManager.getTaskTitle();
-    const formDescriptionValues = TaskManager.getTaskDescription();
-    const newTask = new Task(
-      formTitleValues.title,
-      formDescriptionValues.description
-    );
+    const formTitleValues = TaskManager.getTaskTitle(),
+      formDescriptionValues = TaskManager.getTaskDescription(),
+      newTask = new Task(
+        formTitleValues.title,
+        formDescriptionValues.description
+      );
 
     if (TaskManager.isValidTask(newTask)) {
       TaskManager.addTaskDOM(newTask);
